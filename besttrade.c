@@ -1,6 +1,6 @@
 
 // Starter code provided by David Sykes. All four functions have stubs
-// Code completed by _____________
+// Code completed by the ethereal Bennett Joyce and the polymath Ivan Gu
 //
 
 #include <stdio.h>
@@ -47,8 +47,8 @@ struct Trade trade_bf(int *price, int n) {
     int sell_index = n;
     int best_profit = price[sell_index] - price[buy_index];
 
-    for (int i = 1; i < n-1; i++) {
-        for (int j = i+1; j < n; j++) {
+    for (int i = 1; i < n ; i++) {
+        for (int j = i+1; j <= n; j++) {
             int temp = price[j] - price[i];
             if (temp > best_profit) {
                 best_profit = temp;
@@ -77,9 +77,7 @@ struct Trade trade_dc(int *price, int n) {
     assert(price && n > 0);  // Check precondition
 
     struct Trade result;
-//        result.buy_day_nbr = 1;
-//        result.sell_day_nbr = 1;
-//        result.profit = 0;
+
 
     if (n == 1) {
         result.buy_day_nbr = 1;
@@ -89,37 +87,34 @@ struct Trade trade_dc(int *price, int n) {
     }
     //printf("%s%i%s", "length: ", length, "\n");
 
-    int length = n/2;            // about half
+    int length = n/2;
+    int latter_length = n - length;// about half
     int *former = price;       // has m elements
     int *latter = price + length;
 
-    int maximum;
-    int buy;
-    int sell;
-    int case3 = latter[max_price_day_nbr(latter, length)] - former[min_price_day_nbr(former, length)];
+    //int maximum;
+    struct Trade case3;
+    case3.profit = latter[max_price_day_nbr(latter, latter_length)] - former[min_price_day_nbr(former, length)];
+    case3.buy_day_nbr = min_price_day_nbr(former, length);
+    case3.sell_day_nbr = max_price_day_nbr(latter, latter_length) + length;
 
-    //          1                                   2                                       1                        3
-    if ((trade_dc(former, length).profit > trade_dc(latter, length).profit) && (trade_dc(former, length).profit > case3)) {
-        maximum = trade_dc(former,length).profit;
-       // buy = ;
-      //  sell = ;
+    struct Trade maximum_former = trade_dc(former, length);
+    struct Trade maximum_latter = trade_dc(latter,latter_length);
+    //          1                                   2               1                        3
+    if ((maximum_former.profit >maximum_latter.profit) && (maximum_former.profit > case3.profit)) {
+        result.profit = maximum_former.profit;
+        result.sell_day_nbr = max_price_day_nbr(former, length);
+        result.buy_day_nbr = min_price_day_nbr(former, length);
     //              2                             3
-    } else if (trade_dc(latter,length).profit > case3) {
-        maximum = trade_dc(latter, length).profit;
-       // buy = min_price_day_nbr(latter,length);
-       // sell = max_price_day_nbr(latter,length);
-    } else {
-        maximum = case3;
-        //buy = min_price_day_nbr(former, length);
-        //sell = max_price_day_nbr(latter, length);
-    }
+    } else if (maximum_latter.profit > case3.profit) {
+        result.profit = maximum_latter.profit;
+        result.sell_day_nbr = max_price_day_nbr(latter, latter_length)+ length;
+        result.buy_day_nbr = min_price_day_nbr(latter, latter_length) + length;
 
-    print_prices(price,n);
-    printf("%s","\n");
+    } else { result = case3; }
 
-    result.buy_day_nbr = min_price_day_nbr(former, length);
-    result.sell_day_nbr = max_price_day_nbr(latter, length);
-    result.profit = maximum;
+   // print_prices(price,n);
+   // printf("%s","\n");
     return result;
 }
 
@@ -207,16 +202,18 @@ struct Trade trade_kadane(int *price, int n) {
     int B = 1;
     int best_profit = 0;
 
-    // TODO -- replace stub code
-    for (int i = 2; i < n+1; i++) {
+
+    for (int i = 2; i <= n ; i++) {
         if (price[i] < price[buy_index]) {
             B = i;
+           // buy_index = i;
         }
-        int temp = price[i] - price[B];
-        if (temp >= best_profit) {
+
+        int profit = price[i] - price[B];
+        if (profit >= best_profit) {
             sell_index = i;
             buy_index = B;
-            best_profit = temp;
+            best_profit = profit;
         }
     }
 
